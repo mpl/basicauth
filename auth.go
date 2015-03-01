@@ -20,6 +20,9 @@ type UserPass struct {
 }
 
 func New(userpass string) (*UserPass, error) {
+	if userpass == "" {
+		return &UserPass{}, nil
+	}
 	if strings.HasPrefix(userpass, ":") {
 		return &UserPass{
 			p: strings.TrimPrefix(userpass, ":"),
@@ -32,7 +35,7 @@ func New(userpass string) (*UserPass, error) {
 	}
 	pieces := strings.Split(userpass, ":")
 	if len(pieces) != 2 {
-		return nil, fmt.Errorf("wrong userpass format; got %;, wanted \"username:password\"", userpass)
+		return nil, fmt.Errorf("wrong userpass format; got %q, wanted \"username:password\"", userpass)
 	}
 	return &UserPass{
 		u: pieces[0],
