@@ -1,3 +1,6 @@
+// 2015 - Mathieu Lonjaret
+
+// Package basicauth provides HTTP basic access authentication.
 package basicauth
 
 import (
@@ -15,22 +18,23 @@ var (
 )
 
 type UserPass struct {
-	u string
-	p string
+	U string // username
+	P string // password
 }
 
+// New takes a username:password string and returns a *UserPass.
 func New(userpass string) (*UserPass, error) {
 	if userpass == "" {
 		return &UserPass{}, nil
 	}
 	if strings.HasPrefix(userpass, ":") {
 		return &UserPass{
-			p: strings.TrimPrefix(userpass, ":"),
+			P: strings.TrimPrefix(userpass, ":"),
 		}, nil
 	}
 	if strings.HasSuffix(userpass, ":") {
 		return &UserPass{
-			u: strings.TrimSuffix(userpass, ":"),
+			U: strings.TrimSuffix(userpass, ":"),
 		}, nil
 	}
 	pieces := strings.Split(userpass, ":")
@@ -38,8 +42,8 @@ func New(userpass string) (*UserPass, error) {
 		return nil, fmt.Errorf("wrong userpass format; got %q, wanted \"username:password\"", userpass)
 	}
 	return &UserPass{
-		u: pieces[0],
-		p: pieces[1],
+		U: pieces[0],
+		P: pieces[1],
 	}, nil
 }
 
@@ -66,8 +70,9 @@ func basicAuth(req *http.Request) (string, string, error) {
 	return pieces[0], pieces[1], nil
 }
 
+// IsAllowed returns true if req authenticates succesfully against up.
 func (up *UserPass) IsAllowed(req *http.Request) bool {
-	if up.u == "" && up.p == "" {
+	if up.U == "" && up.P == "" {
 		return true
 	}
 	user, pass, err := basicAuth(req)
@@ -77,7 +82,7 @@ func (up *UserPass) IsAllowed(req *http.Request) bool {
 		}
 		return false
 	}
-	return user == up.u && pass == up.p
+	return user == up.U && pass == up.P
 }
 
 func SendUnauthorized(rw http.ResponseWriter, req *http.Request, realm string) {
@@ -85,5 +90,4 @@ func SendUnauthorized(rw http.ResponseWriter, req *http.Request, realm string) {
 	rw.WriteHeader(http.StatusUnauthorized)
 	fmt.Fprintf(rw, "<html><body><h1>Unauthorized</h1></body></html>")
 }
-
 
