@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	Verbose bool
+	Verbose           bool
 	kBasicAuthPattern = regexp.MustCompile(`^Basic ([a-zA-Z0-9\+/=]+)`)
 )
 
@@ -72,6 +72,9 @@ func basicAuth(req *http.Request) (string, string, error) {
 
 // IsAllowed returns true if req authenticates succesfully against up.
 func (up *UserPass) IsAllowed(req *http.Request) bool {
+	if up == nil {
+		return true
+	}
 	if up.U == "" && up.P == "" {
 		return true
 	}
@@ -90,4 +93,3 @@ func SendUnauthorized(rw http.ResponseWriter, req *http.Request, realm string) {
 	rw.WriteHeader(http.StatusUnauthorized)
 	fmt.Fprintf(rw, "<html><body><h1>Unauthorized</h1></body></html>")
 }
-
