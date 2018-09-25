@@ -54,6 +54,9 @@ func basicAuth(req *http.Request) (string, string, error) {
 	}
 	matches := kBasicAuthPattern.FindStringSubmatch(auth)
 	if len(matches) != 2 {
+		if Verbose {
+			log.Printf("Bogus Auth header: %q", auth)
+		}
 		return "", "", fmt.Errorf("Bogus Authorization header")
 	}
 	encoded := matches[1]
