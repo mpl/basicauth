@@ -85,10 +85,16 @@ func (up *UserPass) IsAllowed(req *http.Request) bool {
 		}
 		return false
 	}
+	if Verbose {
+		log.Printf("Basic Auth: got (%v, %v), want (%v, %v)", user, pass, up.U, up.P)
+	}
 	return user == up.U && pass == up.P
 }
 
 func SendUnauthorized(rw http.ResponseWriter, req *http.Request, realm string) {
+	if Verbose {
+		log.Printf("Basic Auth: unauthorized")
+	}
 	rw.Header().Set("WWW-Authenticate", fmt.Sprintf("Basic realm=%q", realm))
 	rw.WriteHeader(http.StatusUnauthorized)
 	fmt.Fprintf(rw, "<html><body><h1>Unauthorized</h1></body></html>")
