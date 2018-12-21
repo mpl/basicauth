@@ -47,7 +47,8 @@ func New(userpass string) (*UserPass, error) {
 	}, nil
 }
 
-func basicAuth(req *http.Request) (string, string, error) {
+// FromReq returns the HTTP Basic Auth username an password found in req.
+func FromReq(req *http.Request) (string, string, error) {
 	auth := req.Header.Get("Authorization")
 	if auth == "" {
 		return "", "", fmt.Errorf("Missing \"Authorization\" in header")
@@ -81,7 +82,7 @@ func (up *UserPass) IsAllowed(req *http.Request) bool {
 	if up.U == "" && up.P == "" {
 		return true
 	}
-	user, pass, err := basicAuth(req)
+	user, pass, err := FromReq(req)
 	if err != nil {
 		if Verbose {
 			log.Printf("Basic Auth: %v", err)
